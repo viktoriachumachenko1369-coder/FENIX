@@ -1,1 +1,35 @@
+name: Build FENIX APK
 
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download and extract project
+        run: |
+          curl -L "https://raw.githubusercontent.com/viktoriachumachenko1369-coder/FENIX/3df521c9847d0a4f022d1277dc0261b1694ba5d9/FENIX_Android_project%20%283%29.zip" -o fenix.zip
+          mkdir source
+          unzip -o fenix.zip -d source
+          cp -R source/. .
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build APK
+        run: gradle assembleDebug
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: FENIX-APK
+          path: app/build/outputs/apk/debug/app-debug.apk
